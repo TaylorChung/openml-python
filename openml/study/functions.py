@@ -1,10 +1,15 @@
 import xmltodict
+from typing import Union
+import pandas as pd
 
 from openml.study import OpenMLStudy
 import openml._api_calls
 
 
-def get_study(study_id, entity_type=None):
+def get_study(
+        study_id: Union[str, int],
+        entity_type: str = None
+) -> OpenMLStudy:
     """
     Retrieves all relevant information of an OpenML study from the server
     Note that some of the (data, tasks, flows, setups) fields can be empty
@@ -280,8 +285,15 @@ def detach_from_study(study_id, entity_ids):
     return int(result['oml:linked_entities'])
 
 
-def list_studies(offset=None, size=None, main_entity_type=None, status=None,
-                 uploader=None, benchmark_suite=None):
+def list_studies(
+        offset: int = None,
+        size: int = None,
+        main_entity_type: str = None,
+        status: str = None,
+        uploader: list = None,
+        benchmark_suite: str = None,
+        output_format: str = 'dict'
+) -> Union[dict, pd.DataFrame]:
     """
     Return a list of all studies which are on OpenML.
 
@@ -299,6 +311,10 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
         studies are returned.
     uploader : list (int), optional
         Result filter. Will only return studies created by these users.
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
 
     Returns
     -------
@@ -318,8 +334,40 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
 
         If qualities are calculated for the dataset, some of
         these are also returned.
+    datasets : dict of dicts, or dataframe
+        - If output_format='dict'
+            Every dataset is represented by a dictionary containing
+            the following information:
+            - id
+            - alias (optional)
+            - name
+            - main_entity_type
+            - benchmark_suite (optional)
+            - status
+            - creator
+            - creation_date
+            If qualities are calculated for the dataset, some of
+            these are also returned.
+
+        - If output_format='dataframe'
+            Every dataset is represented by a dictionary containing
+            the following information:
+            - id
+            - alias (optional)
+            - name
+            - main_entity_type
+            - benchmark_suite (optional)
+            - status
+            - creator
+            - creation_date
+            If qualities are calculated for the dataset, some of
+            these are also returned.
     """
-    return openml.utils._list_all(_list_studies,
+    if (output_format != 'dataframe' and output_format != 'dict'):
+        raise ValueError("Invalid output format selected. "
+                         "Only 'dict' or 'dataframe' applicable.")
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_studies,
                                   offset=offset,
                                   size=size,
                                   main_entity_type=main_entity_type,
@@ -328,12 +376,16 @@ def list_studies(offset=None, size=None, main_entity_type=None, status=None,
                                   benchmark_suite=benchmark_suite)
 
 
-def _list_studies(**kwargs):
+def _list_studies(output_format='dict', **kwargs):
     """
     Perform api call to return a list of studies.
 
     Parameters
     ----------
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
         status, limit, offset, main_entity_type, uploader
@@ -346,10 +398,10 @@ def _list_studies(**kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += "/%s/%s" % (operator, value)
-    return __list_studies(api_call)
+    return __list_studies(api_call=api_call, output_format=output_format)
 
 
-def __list_studies(api_call):
+def __list_studies(api_call, output_format='object'):
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     study_dict = xmltodict.parse(xml_string, force_list=('oml:study',))
 
@@ -379,4 +431,7 @@ def __list_studies(api_call):
                 current_study[real_field_name] = cast_fn(study_[oml_field_name])
         current_study['id'] = int(current_study['id'])
         studies[study_id] = current_study
+
+    if output_format == 'dataframe':
+        studies = pd.DataFrame.from_dict(studies, orient='index')
     return studies

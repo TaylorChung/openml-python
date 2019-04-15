@@ -11,6 +11,7 @@ import numpy as np
 import sklearn.pipeline
 import xmltodict
 import sklearn.metrics
+import pandas as pd
 
 import openml
 import openml.utils
@@ -1055,9 +1056,19 @@ def _get_cached_run(run_id):
                                    "cached" % run_id)
 
 
-def list_runs(offset=None, size=None, id=None, task=None, setup=None,
-              flow=None, uploader=None, tag=None, display_errors=False,
-              output_format='dict', **kwargs):
+def list_runs(
+        offset: int = None,
+        size: int = None,
+        id: list = None,
+        task: list = None,
+        setup: list = None,
+        flow: list = None,
+        uploader: list = None,
+        tag: str = None,
+        display_errors: bool = False,
+        output_format: str = 'dict',
+        **kwargs: dict
+) -> Union[dict, pd.DataFrame]:
     """
     List all runs matching all of the given filters.
     (Supports large amount of results)
@@ -1068,7 +1079,6 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
         the number of runs to skip, starting from the first
     size : int, optional
         the maximum number of runs to show
-
     id : list, optional
 
     task : list, optional
@@ -1095,18 +1105,36 @@ def list_runs(offset=None, size=None, id=None, task=None, setup=None,
 
     Returns
     -------
-    dict
-        List of found runs.
+    dict of dicts, or dataframe
     """
+    if output_format != 'dataframe' and output_format != 'dict':
+        raise ValueError("Invalid output format selected. "
+                         "Only 'dict' or 'dataframe' applicable.")
 
-    return openml.utils._list_all(
-        output_format, _list_runs, offset=offset, size=size, id=id, task=task,
-        setup=setup, flow=flow, uploader=uploader, tag=tag,
-        display_errors=display_errors, **kwargs)
+    return openml.utils._list_all(output_format=output_format,
+                                  listing_call=_list_runs,
+                                  offset=offset,
+                                  size=size,
+                                  id=id,
+                                  task=task,
+                                  setup=setup,
+                                  flow=flow,
+                                  uploader=uploader,
+                                  tag=tag,
+                                  display_errors=display_errors,
+                                  **kwargs)
 
 
-def _list_runs(id=None, task=None, setup=None,
-               flow=None, uploader=None, display_errors=False, **kwargs):
+def _list_runs(
+        id: list = None,
+        task: list = None,
+        setup: list = None,
+        flow: list = None,
+        uploader: list = None,
+        display_errors: bool = False,
+        output_format: str = 'dict',
+        **kwargs
+) -> Union[dict, pd.DataFrame]:
     """
     Perform API call `/run/list/{filters}'
     <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`
@@ -1132,12 +1160,17 @@ def _list_runs(id=None, task=None, setup=None,
         Whether to list runs which have an error (for example a missing
         prediction file).
 
+    output_format: str, optional (default='dict')
+        The parameter decides the format of the output.
+        - If 'dict' the output is a dict of dict
+        - If 'dataframe' the output is a pandas DataFrame
+
     kwargs : dict, optional
         Legal filter operators: task_type.
 
     Returns
     -------
-    dict
+    dict, or dataframe
         List of found runs.
     """
 
@@ -1157,10 +1190,10 @@ def _list_runs(id=None, task=None, setup=None,
         api_call += "/uploader/%s" % ','.join([str(int(i)) for i in uploader])
     if display_errors:
         api_call += "/show_errors/true"
-    return __list_runs(api_call)
+    return __list_runs(api_call=api_call, output_format=output_format)
 
 
-def __list_runs(api_call):
+def __list_runs(api_call, output_format='dict'):
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, 'get')
     runs_dict = xmltodict.parse(xml_string, force_list=('oml:run',))
@@ -1191,5 +1224,8 @@ def __list_runs(api_call):
                'uploader': int(run_['oml:uploader'])}
 
         runs[run_id] = run
+
+    if output_format == 'dataframe':
+        runs = pd.DataFrame.from_dict(runs, orient='index')
 
     return runs
