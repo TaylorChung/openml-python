@@ -7,8 +7,8 @@ import openml._api_calls
 
 
 def get_study(
-        study_id: Union[str, int],
-        entity_type: str = None
+    study_id: Union[str, int],
+    entity_type: str = None
 ) -> OpenMLStudy:
     """
     Retrieves all relevant information of an OpenML study from the server
@@ -21,7 +21,8 @@ def get_study(
         study id (numeric or alias)
 
     entity_type : str (optional)
-        Which entity type to return. Either {data, tasks, flows, setups,
+        Which entity type to Union[str, int],
+    entity_ty return. Either {data, tasks, flows, setups,
         runs}. Give None to return all entity types.
 
     Return
@@ -286,13 +287,13 @@ def detach_from_study(study_id, entity_ids):
 
 
 def list_studies(
-        offset: int = None,
-        size: int = None,
-        main_entity_type: str = None,
-        status: str = None,
-        uploader: list = None,
-        benchmark_suite: str = None,
-        output_format: str = 'dict'
+    offset: int = None,
+    size: int = None,
+    main_entity_type: str = None,
+    status: str = None,
+    uploader: list = None,
+    benchmark_suite: str = None,
+    output_format: str = 'dict'
 ) -> Union[dict, pd.DataFrame]:
     """
     Return a list of all studies which are on OpenML.
@@ -363,7 +364,7 @@ def list_studies(
             If qualities are calculated for the dataset, some of
             these are also returned.
     """
-    if (output_format != 'dataframe' and output_format != 'dict'):
+    if output_format not in ['dataframe', 'dict']:
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
     return openml.utils._list_all(output_format=output_format,

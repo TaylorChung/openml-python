@@ -90,7 +90,7 @@ def _get_cached_datasets():
 
 
 def _get_cached_dataset(
-        dataset_id: int
+    dataset_id: int
 ) -> OpenMLDataset:
     """Get cached dataset for ID.
 
@@ -173,12 +173,12 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
 
 
 def list_datasets(
-        offset: int = None,
-        size: int = None,
-        status: str = None,
-        tag: str = None,
-        output_format: str = 'dict',
-        **kwargs: dict
+    offset: int = None,
+    size: int = None,
+    status: str = None,
+    tag: str = None,
+    output_format: str = 'dict',
+    **kwargs: dict
 ) -> Union[Dict, pd.DataFrame]:
 
     """
@@ -230,7 +230,7 @@ def list_datasets(
             If qualities are calculated for the dataset, some of
             these are also included as columns.
     """
-    if output_format != 'dataframe' and output_format != 'dict':
+    if output_format not in ['dataframe', 'dict']:
         raise ValueError("Invalid output format selected. "
                          "Only 'dict' or 'dataframe' applicable.")
 
@@ -340,8 +340,8 @@ def check_datasets_active(dataset_ids: List[int]) -> Dict[int, bool]:
 
 
 def get_datasets(
-        dataset_ids: List[Union[str, int]],
-        download_data: bool = True,
+    dataset_ids: List[Union[str, int]],
+    download_data: bool = True,
 ) -> List[OpenMLDataset]:
     """Download datasets.
 
@@ -369,8 +369,8 @@ def get_datasets(
 
 
 def get_dataset(
-        dataset_id: Union[int, str],
-        download_data: bool = True
+    dataset_id: Union[int, str],
+    download_data: bool = True
 ) -> OpenMLDataset:
 
     """ Download the OpenML dataset representation, optionally also download actual data file.
@@ -677,8 +677,8 @@ def create_dataset(name, description, creator, contributor,
 
 
 def status_update(
-        data_id: int,
-        status: str
+    data_id: int,
+    status: str
 ) -> None:
     """
     Updates the status of a dataset to either 'active' or 'deactivated'.
@@ -710,8 +710,8 @@ def status_update(
 
 
 def _get_dataset_description(
-        did_cache_dir: str,
-        dataset_id: int
+    did_cache_dir: str,
+    dataset_id: int
 ) -> dict:
     """Get the dataset description as xml dictionary.
 
@@ -752,8 +752,8 @@ def _get_dataset_description(
 
 
 def _get_dataset_arff(
-        description: Union[Dict, OpenMLDataset],
-        cache_directory: str = None
+    description: Union[Dict, OpenMLDataset],
+    cache_directory: str = None
 ) -> str:
 
     """ Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
@@ -808,8 +808,8 @@ def _get_dataset_arff(
 
 
 def _get_dataset_features(
-        did_cache_dir: str,
-        dataset_id: int
+    did_cache_dir: str,
+    dataset_id: int
 ) -> str:
     """API call to get dataset features (cached)
 
@@ -844,8 +844,8 @@ def _get_dataset_features(
 
 
 def _get_dataset_qualities(
-        did_cache_dir: str,
-        dataset_id: int
+    did_cache_dir: str,
+    dataset_id: int
 ) -> dict:
     """API call to get dataset qualities (cached)
 
@@ -885,10 +885,10 @@ def _get_dataset_qualities(
 
 
 def _create_dataset_from_description(
-        description: Dict[str, str],
-        features: Dict,
-        qualities: List,
-        arff_file: str = None,
+    description: Dict[str, str],
+    features: Dict,
+    qualities: List,
+    arff_file: str = None,
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
 
@@ -939,7 +939,7 @@ def _create_dataset_from_description(
 
 
 def _get_online_dataset_arff(
-        dataset_id: int
+    dataset_id: int
 ) -> str:
     """Download the ARFF file for a given dataset id
     from the OpenML website.
@@ -965,7 +965,7 @@ def _get_online_dataset_arff(
 
 
 def _get_online_dataset_format(
-        dataset_id: int
+    dataset_id: int
 ) -> str:
     """Get the dataset format for a given dataset id
     from the OpenML website.
