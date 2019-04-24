@@ -15,6 +15,7 @@ import openml._api_calls
 import sklearn
 import unittest
 import warnings
+import pandas as pd
 
 from openml.testing import TestBase
 from openml.runs.functions import _run_task_get_arffcontent, \
@@ -1332,6 +1333,10 @@ class TestRun(TestBase):
             raise ValueError('UnitTest Outdated, got somehow results')
 
         self.assertIsInstance(runs, dict)
+
+    def test_list_runs_output_format(self):
+        runs = openml.runs.list_runs(size=1000, output_format='dataframe')
+        self.assertIsInstance(runs, pd.DataFrame)
 
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
