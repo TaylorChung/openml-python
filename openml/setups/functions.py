@@ -5,7 +5,7 @@ import openml
 import os
 import xmltodict
 import pandas as pd
-from typing import Union
+from typing import Union, List
 
 from .. import config
 from .setup import OpenMLSetup, OpenMLParameter
@@ -114,7 +114,7 @@ def list_setups(
     size: int = None,
     flow: int = None,
     tag: str = None,
-    setup: list = None,
+    setup: List = None,
     output_format: str = 'dict'
 ) -> Union[dict, pd.DataFrame]:
     """

@@ -1,5 +1,5 @@
 import xmltodict
-from typing import Union
+from typing import Union, List
 import pandas as pd
 
 from openml.study import OpenMLStudy
@@ -291,7 +291,7 @@ def list_studies(
     size: int = None,
     main_entity_type: str = None,
     status: str = None,
-    uploader: list = None,
+    uploader: List = None,
     benchmark_suite: str = None,
     output_format: str = 'dict'
 ) -> Union[dict, pd.DataFrame]:

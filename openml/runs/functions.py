@@ -1059,11 +1059,11 @@ def _get_cached_run(run_id):
 def list_runs(
     offset: int = None,
     size: int = None,
-    id: list = None,
-    task: list = None,
-    setup: list = None,
-    flow: list = None,
-    uploader: list = None,
+    id: List = None,
+    task: List = None,
+    setup: List = None,
+    flow: List = None,
+    uploader: List = None,
     tag: str = None,
     display_errors: bool = False,
     output_format: str = 'dict',
@@ -1126,11 +1126,11 @@ def list_runs(
 
 
 def _list_runs(
-    id: list = None,
-    task: list = None,
-    setup: list = None,
-    flow: list = None,
-    uploader: list = None,
+    id: List = None,
+    task: List = None,
+    setup: List = None,
+    flow: List = None,
+    uploader: List = None,
     display_errors: bool = False,
     output_format: str = 'dict',
     **kwargs
